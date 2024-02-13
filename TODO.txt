@@ -1,0 +1,9 @@
+APK neu bauen !
+
+Python:
+    In MQTT_Elzwelle eine update MQTT Nachricht senden wenn Google eintrag OK
+
+Flutter:
+    Funktion find(stamp) für timestamp Liste
+    Funktion update(stamp,...) für timestamp Liste
+    MQTT Handler für update Nachricht

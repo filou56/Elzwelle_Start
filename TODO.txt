@@ -7,3 +7,8 @@ Flutter:
     Funktion find(stamp) für timestamp Liste
     Funktion update(stamp,...) für timestamp Liste
     MQTT Handler für update Nachricht
+
+Upload:
+-------------------------------------------------------------------
+
+Android/Sdk/platform-tools/adb -s R9YRA0ELAEM install workspace_android/elzwelle_start/build/app/outputs/flutter-apk/app-release.apk

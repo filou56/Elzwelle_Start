@@ -3,7 +3,7 @@
 A Flutter project.
 
 ## Getting Started
-Open release link and download "app_release.apk"
+Open release link and download "app_release.apk".  
 Read one of the following instructions:
 
 English:  https://www.androidauthority.com/how-to-install-apks-31494/  

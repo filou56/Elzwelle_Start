@@ -5,30 +5,30 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 
 class MqttHandler with ChangeNotifier {
   final ValueNotifier<String> data = ValueNotifier<String>("");
-  late  MqttServerClient client;
+  late  MqttServerClient _client;
 
   var id = UniqueKey();
 
   Future<Object> connect() async {
-    client = MqttServerClient.withPort(
+    _client = MqttServerClient.withPort(
         '144db7091e4a45cbb0e14506aeed779a.s2.eu.hivemq.cloud', 'elzwelle_$id', 8883);
     // client = MqttServerClient.withPort(
     //     '144db7091e4a45cbb0e14506aeed779a.s2.eu.hivemq.cloud', 'elzwelle_start', 8883);
-    client.logging(on: false);
-    client.onConnected      = onConnected;
-    client.onDisconnected   = onDisconnected;
-    client.onUnsubscribed   = onUnsubscribed;
-    client.onSubscribed     = onSubscribed;
-    client.onSubscribeFail  = onSubscribeFail;
-    client.pongCallback     = pong;
-    client.keepAlivePeriod  = 60;
-    client.connectTimeoutPeriod = 10;
+    _client.logging(on: false);
+    _client.onConnected      = onConnected;
+    _client.onDisconnected   = onDisconnected;
+    _client.onUnsubscribed   = onUnsubscribed;
+    _client.onSubscribed     = onSubscribed;
+    _client.onSubscribeFail  = onSubscribeFail;
+    _client.pongCallback     = pong;
+    _client.keepAlivePeriod  = 60;
+    _client.connectTimeoutPeriod = 10;
     /// HiveMQ uses TLS secure transport
-    client.secure           = true;
-    client.securityContext  = SecurityContext.defaultContext;
-    client.onBadCertificate = (dynamic a) => true;
+    _client.secure           = true;
+    _client.securityContext  = SecurityContext.defaultContext;
+    _client.onBadCertificate = (dynamic a) => true;
     /// Set the correct MQTT protocol for mosquito
-    client.setProtocolV311();
+    _client.setProtocolV311();
 
     final connMessage = MqttConnectMessage()
         .withWillTopic('willtopic')
@@ -38,21 +38,21 @@ class MqttHandler with ChangeNotifier {
 
     print('MQTT_LOGS::Mosquitto client connecting....');
 
-    client.connectionMessage = connMessage;
+    _client.connectionMessage = connMessage;
     try {
       /// HiveMQ uses password authentication
-      await client.connect('welle', 'elzwelle');
+      await _client.connect('welle', 'elzwelle');
     } catch (e) {
         print('Exception: $e');
-      client.disconnect();
+      _client.disconnect();
     }
 
-    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+    if (_client.connectionStatus!.state == MqttConnectionState.connected) {
       print('MQTT_LOGS::Mosquitto client connected');
     } else {
       print(
-          'MQTT_LOGS::ERROR Mosquitto client connection failed - disconnecting, status is ${client.connectionStatus}');
-      client.disconnect();
+          'MQTT_LOGS::ERROR Mosquitto client connection failed - disconnecting, status is ${_client.connectionStatus}');
+      _client.disconnect();
       return -1;
     }
 
@@ -60,22 +60,26 @@ class MqttHandler with ChangeNotifier {
 
     print('MQTT_LOGS::Subscribing to the elzwelle/stopwatch/start topic');
     const topic = 'elzwelle/stopwatch/start/#';
-    client.subscribe(topic, MqttQos.atMostOnce);
+    _client.subscribe(topic, MqttQos.atMostOnce);
 
-    client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+    _client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final rcvMessage = c![0].payload as MqttPublishMessage;
       final rcfPayload = MqttPublishPayload.bytesToStringAsString(rcvMessage.payload.message);
 
       if (c[0].topic == 'elzwelle/stopwatch/start') {
-        data.value = rcfPayload;
-      } else {
+        data.value = rcfPayload+' *'; // + Tag
+      } else if (c[0].topic == 'elzwelle/stopwatch/start/number/akn') {
+        data.value = rcfPayload+' #'; // + Tag
+      } else if (c[0].topic == 'elzwelle/stopwatch/start/number/error') {
+        data.value = rcfPayload+' !'; // + Tag
+      }else {
         // use unique string to force notify listeners
-        data.value = DateTime.now().millisecond.toString();
+        data.value = DateTime.now().millisecondsSinceEpoch.toString();
       }
       notifyListeners();
     });
 
-    return client;
+    return _client;
   }
 
   void onConnected() {
@@ -106,8 +110,8 @@ class MqttHandler with ChangeNotifier {
     final builder = MqttClientPayloadBuilder();
     builder.addString(message);
 
-    if (client.connectionStatus?.state == MqttConnectionState.connected) {
-      client.publishMessage(topic, MqttQos.atMostOnce, builder.payload!);
+    if (_client.connectionStatus?.state == MqttConnectionState.connected) {
+      _client.publishMessage(topic, MqttQos.atMostOnce, builder.payload!);
     }
   }
 }

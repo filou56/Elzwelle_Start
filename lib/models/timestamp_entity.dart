@@ -4,11 +4,13 @@ class TimestampEntity {
   String time;
   String stamp;
   String number;
+  String tag;
 
   TimestampEntity({
     required this.time,
     required this.stamp,
     required this.number,
+    required this.tag,
   });
 
   // factory TimestampEntity.fromSheets(List<String> input) {

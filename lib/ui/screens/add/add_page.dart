@@ -15,14 +15,14 @@ import '../../../providers/mqtt/mqtt_handler.dart';
 // }
 
 class AddPage extends StatefulWidget {
-  final MqttHandler       mqttHandler;
+  final MqttHandler       _mqttHandler;
   final TimestampEntity   timestamp;
 
   const AddPage({
-    required this.timestamp,
-    required this.mqttHandler,
+    required TimestampEntity timestamp,
+    required MqttHandler mqttHandler,
     Key? key,
-  }) : super(key: key);
+  }) : timestamp = timestamp, _mqttHandler = mqttHandler, super(key: key);
 
   @override
   _AddPageState createState() => _AddPageState();
@@ -91,6 +91,7 @@ class _AddPageState extends State<AddPage> {
               ),
 
               MaterialButton(
+                  height: 60,
                   child: const Text(
                     'Startnummer senden',
                     style: TextStyle(
@@ -101,9 +102,10 @@ class _AddPageState extends State<AddPage> {
                   color: Theme.of(context).primaryColor,
                   onPressed: () async {
                     var num = int.parse(_numController.text);
+                    widget.timestamp.tag = '?';
                     widget.timestamp.number = '{:d}'.format(num); // removed '#'+_numController.text;
                     final message = '${widget.timestamp.time} ${widget.timestamp.stamp} ${widget.timestamp.number}';
-                    widget.mqttHandler.publishMessage('elzwelle/stopwatch/start/number',message);
+                    widget._mqttHandler.publishMessage('elzwelle/stopwatch/start/number',message);
                     Navigator.pop(context);
                   }),
             ],

@@ -5,28 +5,52 @@ import 'package:elzwelle_start/ui/screens/add/add_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 
 class HomePage extends StatelessWidget {
-  final MqttHandler mqttHandler;
-  final ScrollController scrollController = ScrollController();
+  final MqttHandler _mqttHandler;
+  final ScrollController _scrollController = ScrollController();
 
   HomePage({
-    required this.mqttHandler,
+    required MqttHandler mqttHandler,
     Key? key,
-  }) : super(key: key);
+  }) : _mqttHandler = mqttHandler, super(key: key);
 
-  final List<TimestampEntity> timestamps =  List.filled(0, TimestampEntity(time: '00:00:00', stamp: '0.00', number: '0'), growable: true);
+  final List<TimestampEntity> _timestamps =  List.filled(0, TimestampEntity(time: '00:00:00', stamp: '0.00', number: '0',tag: '*'), growable: true);
 
-  void append(String s) {
-    var items = s.split(' ');
+  bool _tag(String stamp, String tag) {
+    TimestampEntity _item;
+
+    for (_item in _timestamps ) {
+      if ( _item.stamp == stamp ) {
+        _item.tag = tag;
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  void _update(String s) {
+    var _items = s.split(' ');
+    // print('S: ${s}');
+    // print('Tag: ${items[3]}');
+
     // check for tree items, drop other messages
-    if (items.length == 3) {
-      //timestamps.add(TimestampEntity(time: items[0], stamp: items[1], number: items[2]));
-      timestamps.insert(0,TimestampEntity(time: items[0], stamp: items[1], number: items[2]));
-      print('Length: ${timestamps.length}');
+    if (_items.length == 4) {
+      if (_items[3] == '*') {
+        //timestamps.add(TimestampEntity(time: items[0], stamp: items[1], number: items[2]));
+        _timestamps.insert(0, TimestampEntity(
+            time: _items[0], stamp: _items[1], number: _items[2], tag: _items[3]));
+        print('Insert length: ${_timestamps.length}');
+      } else if (_items[3] == '#') {
+        print('Update AKN Tag');
+        _tag(_items[1],_items[3]);
+      } else if (_items[3] == '!') {
+        print('Update ERROR Tag');
+        _tag(_items[1],_items[3]);
+      }
     }
   }
 
   void scrollDown() {
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
   }
 
   @override
@@ -40,21 +64,21 @@ class HomePage extends StatelessWidget {
         builder: (BuildContext context, String value, Widget? child) {
           print('Notify: $value');
           if (value.isNotEmpty) {
-            append(value);
+            _update(value);
           }
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
               child: ListView.builder(
-                controller: scrollController,
+                controller: _scrollController,
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
-                itemCount: timestamps.length,
+                itemCount: _timestamps.length,
                 itemBuilder: (context, i) {
                   return TimestampCard(
-                      timestamp: timestamps[i],
-                      mqttHandler: mqttHandler,
+                      timestamp: _timestamps[i],
+                      mqttHandler: _mqttHandler,
                     );
                   },
                 ),
@@ -62,7 +86,7 @@ class HomePage extends StatelessWidget {
             ]
           );
         },
-        valueListenable: mqttHandler.data,
+        valueListenable: _mqttHandler.data,
       ),
     );
   } // build
@@ -70,17 +94,57 @@ class HomePage extends StatelessWidget {
 } // class
 
 class TimestampCard extends StatelessWidget {
-  final TimestampEntity timestamp;
-  final MqttHandler mqttHandler;
+  final TimestampEntity _timestamp;
+  final MqttHandler _mqttHandler;
 
   const TimestampCard({
-    required this.mqttHandler,
-    required this.timestamp,
+    required MqttHandler mqttHandler,
+    required TimestampEntity timestamp,
     Key? key,
-  }) : super(key: key);
+  }) : _mqttHandler = mqttHandler, _timestamp = timestamp, super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    TextStyle _textStyle;
+
+    switch(_timestamp.tag) {
+      case '*': {
+        _textStyle = const TextStyle(
+            fontSize: 20.0, fontWeight: FontWeight.bold,
+            color: Colors.grey,
+        );
+      }
+      break;
+      case '#': {
+        _textStyle = const TextStyle(
+            fontSize: 20.0, fontWeight: FontWeight.bold,
+            color: Colors.green,
+        );
+      }
+      break;
+      case '?': {
+        _textStyle = const TextStyle(
+          fontSize: 20.0, fontWeight: FontWeight.bold,
+          color: Colors.cyan,
+        );
+      }
+      break;
+      case '!': {
+        _textStyle = const TextStyle(
+          fontSize: 20.0, fontWeight: FontWeight.bold,
+          color: Colors.red,
+        );
+      }
+      break;
+      default: {
+        _textStyle = const TextStyle(
+          fontSize: 20.0, fontWeight: FontWeight.bold,
+          color: Colors.black12,
+        );
+      }
+      break;
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -88,24 +152,21 @@ class TimestampCard extends StatelessWidget {
           children: [
             Expanded(
               child:
-                Text(timestamp.time,
-                  style: const TextStyle(
-                      fontSize: 20.0, fontWeight: FontWeight.bold),
+                Text(_timestamp.time,
+                  style: _textStyle,
                   textAlign: TextAlign.start,
                 ),
               ),
             Expanded(
               child:
-                Text(timestamp.stamp,
-                    style: const TextStyle(
-                        fontSize: 20.0, fontWeight: FontWeight.bold),
+                Text(_timestamp.stamp,
+                    style: _textStyle,
                     textAlign: TextAlign.start),
             ),
             Expanded(
               child:
-              Text(timestamp.number,
-                  style: const TextStyle(
-                      fontSize: 20.0, fontWeight: FontWeight.bold),
+              Text(_timestamp.number,
+                  style: _textStyle,
                   textAlign: TextAlign.start),
             ),
             Center(
@@ -119,8 +180,8 @@ class TimestampCard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => AddPage(
-                          timestamp:  timestamp,
-                          mqttHandler: mqttHandler,
+                          timestamp:  _timestamp,
+                          mqttHandler: _mqttHandler,
                       ),
                     ),
                   );

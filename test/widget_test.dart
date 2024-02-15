@@ -9,15 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/ui/app.dart';
+import 'package:elzwelle_start/controls/radio_list.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    MqttHandler mqttHandler = MqttHandler();;
+
+    RadioListSelection mode = RadioListSelection(0,['Start','Finish']);
+    MqttHandler mqttHandler = MqttHandler(mode);
 
     mqttHandler.connect();
 
     // Build our app and trigger a frame.
-    await tester.pumpWidget(SheetsApp(mqttHandler: mqttHandler));
+    await tester.pumpWidget(SheetsApp(mqttHandler: mqttHandler,mode: mode));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

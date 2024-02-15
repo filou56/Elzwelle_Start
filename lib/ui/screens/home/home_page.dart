@@ -4,13 +4,15 @@ import 'package:elzwelle_start/models/timestamp_entity.dart';
 import 'package:elzwelle_start/ui/screens/add/add_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/controls/radio_list.dart';
-import 'package:elzwelle_start/controls/drop_down.dart';
+import 'package:elzwelle_start/configs/text_strings.dart';
 
 class HomePage extends StatefulWidget {
-  final MqttHandler mqttHandler;
-  final RadioListValue mode;
+  final MqttHandler         mqttHandler;
+  final RadioListSelection  mode;
 
-  const HomePage({
+  int modeIndex = -1;
+
+  HomePage({
     Key? key,
     required this.mqttHandler,
     required this.mode
@@ -39,13 +41,9 @@ class _HomePageState extends State<HomePage> {
   
   void _update(String s) {
     var _items = s.split(' ');
-    // print('S: ${s}');
-    // print('Tag: ${items[3]}');
-
     // check for tree items, drop other messages
     if (_items.length == 4) {
       if (_items[3] == '*') {
-        //timestamps.add(TimestampEntity(time: items[0], stamp: items[1], number: items[2]));
         _timestamps.insert(0, TimestampEntity(
             time: _items[0], stamp: _items[1], number: _items[2], tag: _items[3]));
         print('Insert length: ${_timestamps.length}');
@@ -67,13 +65,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Timestamps Start'),
+        title: Text(HOME_PAGE_TITLE[widget.mode.index]),
         //backgroundColor: Colors.lightBlue,
         actions: [
           PopupMenuButton(
             itemBuilder: (context) => [
               PopupMenuItem(
-                child: RadioListMode(value: widget.mode),
+                child: RadioListMode(radioList: widget.mode),
               )
             ]
           )
@@ -81,9 +79,16 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ValueListenableBuilder<String>(
         builder: (BuildContext context, String value, Widget? child) {
-          print('Notify: $value Mode: ${widget.mode.index}');
-          if (value.isNotEmpty) {
-            _update(value);
+          if ( widget.modeIndex != widget.mode.index ) {
+            _timestamps.clear();
+            widget.modeIndex = widget.mode.index;
+            print('Clear, Mode: ${widget.mode.index}');
+            value = '';
+          } else {
+            print('Notify: $value ');
+            if (value.isNotEmpty) {
+              _update(value);
+            }
           }
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -96,6 +101,7 @@ class _HomePageState extends State<HomePage> {
                 itemCount: _timestamps.length,
                 itemBuilder: (context, i) {
                   return TimestampCard(
+                      mode: widget.mode,
                       timestamp: _timestamps[i],
                       mqttHandler: widget.mqttHandler,
                     );
@@ -113,20 +119,22 @@ class _HomePageState extends State<HomePage> {
 } // class
 
 class TimestampCard extends StatelessWidget {
-  final TimestampEntity _timestamp;
-  final MqttHandler _mqttHandler;
+  final TimestampEntity     timestamp;
+  final MqttHandler         mqttHandler;
+  final RadioListSelection  mode;
 
   const TimestampCard({
-    required MqttHandler mqttHandler,
-    required TimestampEntity timestamp,
+    required this.mqttHandler,
+    required this.timestamp,
+    required this.mode,
     Key? key,
-  }) : _mqttHandler = mqttHandler, _timestamp = timestamp, super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     TextStyle _textStyle;
 
-    switch(_timestamp.tag) {
+    switch(timestamp.tag) {
       case '*': {
         _textStyle = const TextStyle(
             fontSize: 20.0, fontWeight: FontWeight.bold,
@@ -171,20 +179,20 @@ class TimestampCard extends StatelessWidget {
           children: [
             Expanded(
               child:
-                Text(_timestamp.time,
+                Text(timestamp.time,
                   style: _textStyle,
                   textAlign: TextAlign.start,
                 ),
               ),
             Expanded(
               child:
-                Text(_timestamp.stamp,
+                Text(timestamp.stamp,
                     style: _textStyle,
                     textAlign: TextAlign.start),
             ),
             Expanded(
               child:
-              Text(_timestamp.number,
+              Text(timestamp.number,
                   style: _textStyle,
                   textAlign: TextAlign.start),
             ),
@@ -199,8 +207,9 @@ class TimestampCard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => AddPage(
-                          timestamp:  _timestamp,
-                          mqttHandler: _mqttHandler,
+                          mode: mode,
+                          timestamp:  timestamp,
+                          mqttHandler: mqttHandler,
                       ),
                     ),
                   );

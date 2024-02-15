@@ -1,0 +1,23 @@
+// List<DropdownMenuItem<String>> get dropdownItems{
+//   List<DropdownMenuItem<String>> menuItems = [
+//     const DropdownMenuItem(child: Text("USA"),value: "USA"),
+//     const DropdownMenuItem(child: Text("Canada"),value: "Canada"),
+//     const DropdownMenuItem(child: Text("Brazil"),value: "Brazil"),
+//     const DropdownMenuItem(child: Text("England"),value: "England"),
+//   ];
+//   return menuItems;
+// }
+
+//String selectedValue = "USA";
+
+   /*
+              DropdownButton(
+                  value: selectedValue,
+                  onChanged: (String? newValue){
+                    setState(() {
+                      selectedValue = newValue!;
+                    });
+                  },
+                  items: dropdownItems
+              ),
+              */

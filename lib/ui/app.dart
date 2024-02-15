@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:elzwelle_start/ui/screens/home/home_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/controls/radio_list.dart';
+import 'package:elzwelle_start/configs/text_strings.dart';
 
 const String routeAdd = '/add';
 const String routeHome = '/';
 
 class SheetsApp extends StatelessWidget {
-  final MqttHandler    mqttHandler;
-  final RadioListValue mode = RadioListValue();
+  final MqttHandler mqttHandler;
+  final RadioListSelection mode;
 
-  SheetsApp({
+  const SheetsApp({
     required this.mqttHandler,
+    required this.mode,
     Key? key,
   }) : super(key: key);
 
@@ -41,7 +43,7 @@ class SheetsApp extends StatelessWidget {
           //   ),
           // ),
       ),
-      title: 'Elzwelle Timestamp App',
+      title: APP_TITLE,
       initialRoute: routeHome,
       routes: {
         routeHome: (_) => HomePage(mqttHandler: mqttHandler, mode: mode),

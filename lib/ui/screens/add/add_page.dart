@@ -3,27 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../models/timestamp_entity.dart';
 import '../../../providers/mqtt/mqtt_handler.dart';
-
-// List<DropdownMenuItem<String>> get dropdownItems{
-//   List<DropdownMenuItem<String>> menuItems = [
-//     const DropdownMenuItem(child: Text("USA"),value: "USA"),
-//     const DropdownMenuItem(child: Text("Canada"),value: "Canada"),
-//     const DropdownMenuItem(child: Text("Brazil"),value: "Brazil"),
-//     const DropdownMenuItem(child: Text("England"),value: "England"),
-//   ];
-//   return menuItems;
-// }
+import 'package:elzwelle_start/controls/radio_list.dart';
+import 'package:elzwelle_start/configs/text_strings.dart';
+import 'package:elzwelle_start/configs/mqtt_messages.dart';
 
 class AddPage extends StatefulWidget {
-  final MqttHandler       _mqttHandler;
-  final TimestampEntity   timestamp;
+  final MqttHandler        mqttHandler;
+  final TimestampEntity    timestamp;
+  final RadioListSelection mode;
 
   const AddPage({
-    required TimestampEntity timestamp,
-    required MqttHandler mqttHandler,
+    required this.timestamp,
+    required this.mqttHandler,
+    required this.mode,
     Key? key,
-  }) : timestamp = timestamp, _mqttHandler = mqttHandler, super(key: key);
-
+  }) : super(key: key);
   @override
   _AddPageState createState() => _AddPageState();
 }
@@ -32,7 +26,6 @@ class _AddPageState extends State<AddPage> {
   final TextEditingController _timeController  = TextEditingController();
   final TextEditingController _stampController = TextEditingController();
   final TextEditingController _numController   = TextEditingController();
-  //String selectedValue = "USA";
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +36,7 @@ class _AddPageState extends State<AddPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Startnummer"),
+        title: Text(ADD_PAGE_TITLE[widget.mode.index]),
       ),
       body: Center(
         child: SizedBox(
@@ -52,17 +45,6 @@ class _AddPageState extends State<AddPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              /*
-              DropdownButton(
-                  value: selectedValue,
-                  onChanged: (String? newValue){
-                    setState(() {
-                      selectedValue = newValue!;
-                    });
-                  },
-                  items: dropdownItems
-              ),
-              */
               TextFormField(
                 style: const TextStyle(
                     fontSize: 30.0, fontWeight: FontWeight.bold),
@@ -79,7 +61,7 @@ class _AddPageState extends State<AddPage> {
                 style: const TextStyle(
                     fontSize: 30.0, fontWeight: FontWeight.bold),
                 controller: _numController,
-                decoration: new InputDecoration(labelText: "Startnummer eingeben"),
+                decoration: InputDecoration(labelText: ADD_PAGE_HINT[widget.mode.index]),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
@@ -92,9 +74,9 @@ class _AddPageState extends State<AddPage> {
 
               MaterialButton(
                   height: 60,
-                  child: const Text(
-                    'Startnummer senden',
-                    style: TextStyle(
+                  child: Text(
+                    ADD_PAGE_SEND[widget.mode.index],
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24.0,
                     ),
@@ -105,7 +87,7 @@ class _AddPageState extends State<AddPage> {
                     widget.timestamp.tag = '?';
                     widget.timestamp.number = '{:d}'.format(num); // removed '#'+_numController.text;
                     final message = '${widget.timestamp.time} ${widget.timestamp.stamp} ${widget.timestamp.number}';
-                    widget._mqttHandler.publishMessage('elzwelle/stopwatch/start/number',message);
+                    widget.mqttHandler.publishMessage(MQTT_STAMP_NUM_PUB[widget.mode.index],message);
                     Navigator.pop(context);
                   }),
             ],

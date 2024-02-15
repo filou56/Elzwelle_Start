@@ -1,16 +1,19 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 
-class RadioListValue {
-  int index = 1;
+class RadioListSelection {
+  int index;
+  final List<String> selections;
+
+  RadioListSelection(this.index, this.selections);
 }
 
 class RadioListMode extends StatefulWidget {
-  RadioListValue value;
+  final RadioListSelection radioList;
 
-  RadioListMode({
+  const RadioListMode({
     Key? key,
-    required this.value,
+    required this.radioList,
   }) : super(key: key);
 
   @override
@@ -24,40 +27,25 @@ class _RadioListModeState extends State<RadioListMode> {
     return SizedBox(
         width: double.maxFinite,
         height: 200,
-        child: ListView(
-            shrinkWrap: true,
-            children: <Widget>[
-              // Create a RadioListTile for option 1
-              RadioListTile(
-                fillColor: MaterialStateColor.resolveWith((states) => Colors.blue),
-                title: const Text('Start'),                       // Display the title for option 1
-                //subtitle: const Text('Subtitle for Option 1'),  // Display a subtitle for option 1
-                value: 1,                                         // Assign a value of 1 to this option
-                groupValue: widget.value.index,                   // Use _selectedValue to track the selected option
-                onChanged: (value) {
-                  setState(() {
-                    widget.value.index = value! as int; // Update _selectedValue when option 1 is selected
-                    Navigator.popAndPushNamed(context,'/');
-                  });
-                },
-              ),
-
-              // Create a RadioListTile for option 2
-              RadioListTile(
-                fillColor: MaterialStateColor.resolveWith((states) => Colors.blue),
-                title: const Text('Finish'),                      // Display the title for option 2
-                //subtitle: const Text('Subtitle for Option 2'),  // Display a subtitle for option 2
-                value: 2,                                         // Assign a value of 2 to this option
-                groupValue: widget.value.index,                   // Use _selectedValue to track the selected option
-                onChanged: (value) {
-                  setState(() {
-                    widget.value.index = value! as int; // Update _selectedValue when option 2 is selected
-                    Navigator.popAndPushNamed(context,'/');
-                  });
-                },
-              ),
-            ]
-        )
+        child: ListView.builder(
+          itemBuilder: (BuildContext context, int index) {
+            return RadioListTile<int>(
+              fillColor: MaterialStateColor.resolveWith((states) => Colors.blue),
+              value: index,
+              groupValue: widget.radioList.index,
+              toggleable: true,
+              title: Text(widget.radioList.selections[index]),
+              onChanged: (int? value) {
+                setState(() {
+                  widget.radioList.index = value!;
+                  // force restart from begin with new mode
+                  Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+                });
+              },
+            );
+          },
+          itemCount: widget.radioList.selections.length,
+        ),
     );
   }
 }

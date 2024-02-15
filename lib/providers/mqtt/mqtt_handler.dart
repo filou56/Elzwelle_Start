@@ -2,18 +2,22 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+import 'package:elzwelle_start/controls/radio_list.dart';
+import 'package:elzwelle_start/configs/mqtt_messages.dart';
+import 'package:elzwelle_start/configs/config.dart';
 
 class MqttHandler with ChangeNotifier {
   final ValueNotifier<String> data = ValueNotifier<String>("");
+  final RadioListSelection mode;
   late  MqttServerClient _client;
+
+  MqttHandler(this.mode);
 
   var id = UniqueKey();
 
   Future<Object> connect() async {
     _client = MqttServerClient.withPort(
-        '144db7091e4a45cbb0e14506aeed779a.s2.eu.hivemq.cloud', 'elzwelle_$id', 8883);
-    // client = MqttServerClient.withPort(
-    //     '144db7091e4a45cbb0e14506aeed779a.s2.eu.hivemq.cloud', 'elzwelle_start', 8883);
+        MQTT_URL, MQTT_ID_PREFIX+id.toString(), MQTT_PORT);
     _client.logging(on: false);
     _client.onConnected      = onConnected;
     _client.onDisconnected   = onDisconnected;
@@ -24,15 +28,15 @@ class MqttHandler with ChangeNotifier {
     _client.keepAlivePeriod  = 60;
     _client.connectTimeoutPeriod = 10;
     /// HiveMQ uses TLS secure transport
-    _client.secure           = true;
+    _client.secure           = MQTT_SECURE;
     _client.securityContext  = SecurityContext.defaultContext;
     _client.onBadCertificate = (dynamic a) => true;
     /// Set the correct MQTT protocol for mosquito
     _client.setProtocolV311();
 
     final connMessage = MqttConnectMessage()
-        .withWillTopic('willtopic')
-        .withWillMessage('Will message')
+        .withWillTopic(MQTT_WILL_TOPIC)
+        .withWillMessage(MQTT_WILL_MSG)
         .startClean()
         .withWillQos(MqttQos.atLeastOnce);
 
@@ -41,7 +45,7 @@ class MqttHandler with ChangeNotifier {
     _client.connectionMessage = connMessage;
     try {
       /// HiveMQ uses password authentication
-      await _client.connect('welle', 'elzwelle');
+      await _client.connect(MQTT_USER, MQTT_PASSWD);
     } catch (e) {
         print('Exception: $e');
       _client.disconnect();
@@ -58,19 +62,19 @@ class MqttHandler with ChangeNotifier {
 
     sleep(const Duration(seconds: 1));
 
-    print('MQTT_LOGS::Subscribing to the elzwelle/stopwatch/start topic');
-    const topic = 'elzwelle/stopwatch/start/#';
+    print('MQTT_LOGS::Subscribing to the topic');
+    const topic = MQTT_TOPIC;
     _client.subscribe(topic, MqttQos.atMostOnce);
 
     _client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final rcvMessage = c![0].payload as MqttPublishMessage;
       final rcfPayload = MqttPublishPayload.bytesToStringAsString(rcvMessage.payload.message);
 
-      if (c[0].topic == 'elzwelle/stopwatch/start') {
+      if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {
         data.value = rcfPayload+' *'; // + Tag
-      } else if (c[0].topic == 'elzwelle/stopwatch/start/number/akn') {
+      } else if (c[0].topic == MQTT_STAMP_NUM_AKN[mode.index]) {
         data.value = rcfPayload+' #'; // + Tag
-      } else if (c[0].topic == 'elzwelle/stopwatch/start/number/error') {
+      } else if (c[0].topic == MQTT_STAMP_NUM_ERROR[mode.index]) {
         data.value = rcfPayload+' !'; // + Tag
       }else {
         // use unique string to force notify listeners

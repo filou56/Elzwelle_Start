@@ -3,16 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:elzwelle_start/models/timestamp_entity.dart';
 import 'package:elzwelle_start/ui/screens/add/add_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
+import 'package:elzwelle_start/controls/radio_list.dart';
+import 'package:elzwelle_start/controls/drop_down.dart';
 
-class HomePage extends StatelessWidget {
-  final MqttHandler _mqttHandler;
-  final ScrollController _scrollController = ScrollController();
+class HomePage extends StatefulWidget {
+  final MqttHandler mqttHandler;
+  final RadioListValue mode;
 
-  HomePage({
-    required MqttHandler mqttHandler,
+  const HomePage({
     Key? key,
-  }) : _mqttHandler = mqttHandler, super(key: key);
+    required this.mqttHandler,
+    required this.mode
+  }) : super(key: key);
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  final ScrollController _scrollController = ScrollController();
   final List<TimestampEntity> _timestamps =  List.filled(0, TimestampEntity(time: '00:00:00', stamp: '0.00', number: '0',tag: '*'), growable: true);
 
   bool _tag(String stamp, String tag) {
@@ -59,10 +69,19 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Timestamps Start'),
         //backgroundColor: Colors.lightBlue,
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: RadioListMode(value: widget.mode),
+              )
+            ]
+          )
+        ],
       ),
       body: ValueListenableBuilder<String>(
         builder: (BuildContext context, String value, Widget? child) {
-          print('Notify: $value');
+          print('Notify: $value Mode: ${widget.mode.index}');
           if (value.isNotEmpty) {
             _update(value);
           }
@@ -78,7 +97,7 @@ class HomePage extends StatelessWidget {
                 itemBuilder: (context, i) {
                   return TimestampCard(
                       timestamp: _timestamps[i],
-                      mqttHandler: _mqttHandler,
+                      mqttHandler: widget.mqttHandler,
                     );
                   },
                 ),
@@ -86,7 +105,7 @@ class HomePage extends StatelessWidget {
             ]
           );
         },
-        valueListenable: _mqttHandler.data,
+        valueListenable: widget.mqttHandler.data,
       ),
     );
   } // build
@@ -195,3 +214,4 @@ class TimestampCard extends StatelessWidget {
   } // build
 
 } // class
+

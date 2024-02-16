@@ -5,6 +5,7 @@ import 'package:elzwelle_start/ui/screens/add/add_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
+import 'package:elzwelle_start/controls/course_input.dart';
 
 class HomePage extends StatefulWidget {
   final MqttHandler         mqttHandler;
@@ -77,42 +78,55 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: ValueListenableBuilder<String>(
-        builder: (BuildContext context, String value, Widget? child) {
-          if ( widget.modeIndex != widget.mode.index ) {
-            _timestamps.clear();
-            widget.modeIndex = widget.mode.index;
-            print('Clear, Mode: ${widget.mode.index}');
-            value = '';
-          } else {
-            print('Notify: $value ');
-            if (value.isNotEmpty) {
-              _update(value);
-            }
-          }
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: _timestamps.length,
-                itemBuilder: (context, i) {
-                  return TimestampCard(
-                      mode: widget.mode,
-                      timestamp: _timestamps[i],
-                      mqttHandler: widget.mqttHandler,
-                    );
-                  },
-                ),
-              ),
-            ]
-          );
-        },
-        valueListenable: widget.mqttHandler.data,
-      ),
+      body: Container(
+        child: () { // anonymous function
+          print('Index: ${widget.mode.index}');
+          if (widget.mode.index <= 1) { // then container
+            // anonymous function return Widget
+            return ValueListenableBuilder<String>(
+              builder: (BuildContext context, String value, Widget? child) {
+                if (widget.modeIndex != widget.mode.index) {
+                  _timestamps.clear();
+                  widget.modeIndex = widget.mode.index;
+                  print('Clear, Mode: ${widget.mode.index}');
+                  value = '';
+                } else {
+                  print('Notify: $value ');
+                  if (value.isNotEmpty) {
+                    _update(value);
+                  }
+                }
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Expanded(
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: _timestamps.length,
+                        itemBuilder: (context, i) {
+                          return TimestampCard(
+                            mode: widget.mode,
+                            timestamp: _timestamps[i],
+                            mqttHandler: widget.mqttHandler,
+                          );
+                        },  // itemBuilder
+                      ),
+                    ),
+                  ]
+                );
+              }, // builder
+              valueListenable: widget.mqttHandler.data,
+            );
+          } else { // else container
+            // anonymous function return Widget
+            return Center (
+              child: CourseInput(mqttHandler: widget.mqttHandler),
+            );
+          } // end container
+        }() // anonymous function
+      )
     );
   } // build
 

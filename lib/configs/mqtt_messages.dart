@@ -7,4 +7,6 @@ const List<String>MQTT_STAMP_NUM_ERROR = ['elzwelle/stopwatch/start/number/akn',
 const List<String>MQTT_STAMP_NUM_PUB   = ['elzwelle/stopwatch/start/number',
                                           'elzwelle/stopwatch/finish/number'];
 
+const MQTT_COURSE_DATa_PUB = 'elzwelle/stopwatch/course/data';
+
 const MQTT_TOPIC = 'elzwelle/stopwatch/#';

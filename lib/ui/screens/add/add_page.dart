@@ -40,26 +40,26 @@ class _AddPageState extends State<AddPage> {
       ),
       body: Center(
         child: SizedBox(
-          width: size > 300 ? 300 : size,
+          width:  size > 300 ? 300 : size,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 style: const TextStyle(
-                    fontSize: 30.0, fontWeight: FontWeight.bold),
+                    fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _timeController,
                 onChanged: (_) => setState(() {}),
               ),
               TextFormField(
                 style: const TextStyle(
-                    fontSize: 30.0, fontWeight: FontWeight.bold),
+                    fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _stampController,
                 onChanged: (_) => setState(() {}),
               ),
               TextField(
                 style: const TextStyle(
-                    fontSize: 30.0, fontWeight: FontWeight.bold),
+                    fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _numController,
                 decoration: InputDecoration(labelText: ADD_PAGE_HINT[widget.mode.index]),
                 keyboardType: TextInputType.number,
@@ -71,24 +71,32 @@ class _AddPageState extends State<AddPage> {
               const SizedBox(
                 height: 12.0,
               ),
-
               MaterialButton(
-                  height: 60,
+                  height: 58,
                   child: Text(
                     ADD_PAGE_SEND[widget.mode.index],
                     style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 24.0,
+                        fontSize: 22.0,
                     ),
                   ),
                   color: Theme.of(context).primaryColor,
                   onPressed: () async {
-                    var num = int.parse(_numController.text);
-                    widget.timestamp.tag = '?';
-                    widget.timestamp.number = '{:d}'.format(num); // removed '#'+_numController.text;
-                    final message = '${widget.timestamp.time} ${widget.timestamp.stamp} ${widget.timestamp.number}';
-                    widget.mqttHandler.publishMessage(MQTT_STAMP_NUM_PUB[widget.mode.index],message);
-                    Navigator.pop(context);
+                    try {
+                      var num = int.parse(_numController.text);
+                      widget.timestamp.tag = '?';
+                      widget.timestamp.number = '{:d}'.format(
+                      num); // removed '#'+_numController.text;
+                      final message = '${widget.timestamp.time} ${widget
+                          .timestamp.stamp} ${widget.timestamp.number}';
+                      widget.mqttHandler.publishMessage(
+                      MQTT_STAMP_NUM_PUB[widget.mode.index], message);
+                      } on Exception catch (e) {
+                        // Anything else that is an exception
+                        print('add_page exception: $e');
+                    } finally {
+                      Navigator.pop(context);
+                    }
                   }),
             ],
           ),

@@ -7,6 +7,7 @@ import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
 import 'package:elzwelle_start/controls/course_input.dart';
 
+// ignore: must_be_immutable
 class HomePage extends StatefulWidget {
   final MqttHandler         mqttHandler;
   final RadioListSelection  mode;

@@ -66,11 +66,15 @@ class MqttHandler with ChangeNotifier {
     const topic = MQTT_TOPIC;
     _client.subscribe(topic, MqttQos.atMostOnce);
 
+    //--------------------- Listner -------------------
+
     _client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final rcvMessage = c![0].payload as MqttPublishMessage;
       final rcfPayload = MqttPublishPayload.bytesToStringAsString(rcvMessage.payload.message);
 
-      if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {
+      if (c[0].topic == MQTT_COURSE_DATA_PUB) {
+
+      } else if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {
         data.value = rcfPayload+' *'; // + Tag
       } else if (c[0].topic == MQTT_STAMP_NUM_AKN[mode.index]) {
         data.value = rcfPayload+' #'; // + Tag

@@ -23,9 +23,10 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
-  final TextEditingController _timeController  = TextEditingController();
-  final TextEditingController _stampController = TextEditingController();
-  final TextEditingController _numController   = TextEditingController();
+  final TextEditingController _timeController     = TextEditingController();
+  final TextEditingController _stampController    = TextEditingController();
+  final TextEditingController _numController      = TextEditingController();
+  final TextEditingController _remarkController   = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,13 @@ class _AddPageState extends State<AddPage> {
                 style: const TextStyle(
                     fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _stampController,
+                onChanged: (_) => setState(() {}),
+              ),
+              TextFormField(
+                style: const TextStyle(
+                    fontSize: 24.0, fontWeight: FontWeight.bold),
+                controller: _remarkController,
+                decoration: const InputDecoration(labelText: REMARK_HINT),
                 onChanged: (_) => setState(() {}),
               ),
               TextField(
@@ -87,8 +95,9 @@ class _AddPageState extends State<AddPage> {
                       widget.timestamp.tag = '?';
                       widget.timestamp.number = '{:d}'.format(
                       num); // removed '#'+_numController.text;
+                      var remark = _remarkController.text.replaceAll(' ', '_');
                       final message = '${widget.timestamp.time} ${widget
-                          .timestamp.stamp} ${widget.timestamp.number}';
+                          .timestamp.stamp} ${widget.timestamp.number} $remark';
                       widget.mqttHandler.publishMessage(
                       MQTT_STAMP_NUM_PUB[widget.mode.index], message);
                       } on Exception catch (e) {

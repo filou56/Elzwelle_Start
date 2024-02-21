@@ -1,8 +1,6 @@
-import 'package:format/format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../providers/mqtt/mqtt_handler.dart';
-import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
 import 'package:elzwelle_start/configs/mqtt_messages.dart';
 
@@ -17,8 +15,9 @@ List<DropdownMenuItem<String>> get dropdownItems{
   return menuItems;
 }
 
+// ignore: must_be_immutable
 class CourseInput extends StatefulWidget {
-    final MqttHandler        mqttHandler;
+    final MqttHandler mqttHandler;
     String selectedValue = "0";
 
 CourseInput({
@@ -30,8 +29,9 @@ CourseInput({
 }
 
 class _CourseInputState extends State<CourseInput> {
-  final TextEditingController _numController   = TextEditingController();
-  final TextEditingController _gateController  = TextEditingController();
+  final TextEditingController _numController      = TextEditingController();
+  final TextEditingController _gateController     = TextEditingController();
+  final TextEditingController _remarkController   = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +67,13 @@ class _CourseInputState extends State<CourseInput> {
               ], // Only numbers can be entered
               onChanged: (_) => setState(() {}),
             ),
+            TextFormField(
+              style: const TextStyle(
+                  fontSize: 24.0, fontWeight: FontWeight.bold),
+              controller: _remarkController,
+              decoration: const InputDecoration(labelText: REMARK_HINT),
+              onChanged: (_) => setState(() {}),
+            ),
             DropdownButton(
                 value: widget.selectedValue,
                 onChanged: (String? newValue){
@@ -90,20 +97,22 @@ class _CourseInputState extends State<CourseInput> {
               ),
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                var num   = 0;
-                var gate  = 0;
-                var errno = 0;
+                var num     = 0;
+                var gate    = 0;
+                var errno   = 0;
+                var remark  = '';
                 try {
-                  num   = int.parse(_numController.text);
-                  gate  = int.parse(_gateController.text);
-                  errno = int.parse(widget.selectedValue);
-                  final message = '$num,$gate,${widget.selectedValue},${COURSE_SELECTION_TEXT[errno]}';
-                  widget.mqttHandler.publishMessage(MQTT_COURSE_DATa_PUB, message);
+                  num     = int.parse(_numController.text);
+                  gate    = int.parse(_gateController.text);
+                  errno   = int.parse(widget.selectedValue);
+                  remark  = _remarkController.text; //.replaceAll(' ', '_');
+                  final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
+                  widget.mqttHandler.publishMessage(MQTT_COURSE_DATA_PUB, message);
                 } on Exception catch (e) {
                   // Anything else that is an exception
                   print('add_page exception: $e');
                 } finally {
-                  final message = '$num,$gate,${widget.selectedValue},${COURSE_SELECTION_TEXT[errno]}';
+                  final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
                   print('Message: $message');
                 }
               }),

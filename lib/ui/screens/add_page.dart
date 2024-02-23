@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:format/format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../models/timestamp_entity.dart';
-import '../../../providers/mqtt/mqtt_handler.dart';
+import 'package:elzwelle_start/controls/alert.dart';
+import 'package:elzwelle_start/models/timestamp_entity.dart';
+import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
 import 'package:elzwelle_start/configs/mqtt_messages.dart';
@@ -90,6 +92,7 @@ class _AddPageState extends State<AddPage> {
                   ),
                   color: Theme.of(context).primaryColor,
                   onPressed: () async {
+                    var err = true;
                     try {
                       var num = int.parse(_numController.text);
                       widget.timestamp.tag = '?';
@@ -100,11 +103,17 @@ class _AddPageState extends State<AddPage> {
                           .timestamp.stamp} ${widget.timestamp.number} $remark';
                       widget.mqttHandler.publishMessage(
                       MQTT_STAMP_NUM_PUB[widget.mode.index], message);
+                      err = false;
                       } on Exception catch (e) {
                         // Anything else that is an exception
-                        print('add_page exception: $e');
+                        onAlertError(context,"Eingabe Fehler","Ein Parameter wurde nicht korrekt gesetzt!");
+                        if (kDebugMode) {
+                          print('add_page exception: $e');
+                        }
                     } finally {
-                      Navigator.pop(context);
+                      if ( ! err ) {
+                        Navigator.pop(context);
+                      }
                     }
                   }),
             ],

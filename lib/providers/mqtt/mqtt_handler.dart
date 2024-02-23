@@ -40,29 +40,39 @@ class MqttHandler with ChangeNotifier {
         .startClean()
         .withWillQos(MqttQos.atLeastOnce);
 
-    print('MQTT_LOGS::Mosquitto client connecting....');
+    if (kDebugMode) {
+      print('MQTT_LOGS::Mosquitto client connecting....');
+    }
 
     _client.connectionMessage = connMessage;
     try {
       /// HiveMQ uses password authentication
       await _client.connect(MQTT_USER, MQTT_PASSWD);
     } catch (e) {
-        print('Exception: $e');
+        if (kDebugMode) {
+          print('Exception: $e');
+        }
       _client.disconnect();
     }
 
     if (_client.connectionStatus!.state == MqttConnectionState.connected) {
-      print('MQTT_LOGS::Mosquitto client connected');
+      if (kDebugMode) {
+        print('MQTT_LOGS::Mosquitto client connected');
+      }
     } else {
-      print(
+      if (kDebugMode) {
+        print(
           'MQTT_LOGS::ERROR Mosquitto client connection failed - disconnecting, status is ${_client.connectionStatus}');
+      }
       _client.disconnect();
       return -1;
     }
 
     sleep(const Duration(seconds: 1));
 
-    print('MQTT_LOGS::Subscribing to the topic');
+    if (kDebugMode) {
+      print('MQTT_LOGS::Subscribing to the topic');
+    }
     const topic = MQTT_TOPIC;
     _client.subscribe(topic, MqttQos.atMostOnce);
 
@@ -71,6 +81,10 @@ class MqttHandler with ChangeNotifier {
     _client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final rcvMessage = c![0].payload as MqttPublishMessage;
       final rcfPayload = MqttPublishPayload.bytesToStringAsString(rcvMessage.payload.message);
+
+      if (kDebugMode) {
+        print('MQTT_LOGS::Listen received topic: ${c[0].topic} Payload: $rcfPayload');
+      }
 
       if (c[0].topic == MQTT_COURSE_DATA_PUB) {
 
@@ -91,27 +105,39 @@ class MqttHandler with ChangeNotifier {
   }
 
   void onConnected() {
-    print('MQTT_LOGS:: Connected');
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Connected');
+    }
   }
 
   void onDisconnected() {
-    print('MQTT_LOGS:: Disconnected');
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Disconnected');
+    }
   }
 
   void onSubscribed(String topic) {
-    print('MQTT_LOGS:: Subscribed topic: $topic');
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Subscribed topic: $topic');
+    }
   }
 
   void onSubscribeFail(String topic) {
-    print('MQTT_LOGS:: Failed to subscribe $topic');
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Failed to subscribe $topic');
+    }
   }
 
   void onUnsubscribed(String? topic) {
-    print('MQTT_LOGS:: Unsubscribed topic: $topic');
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Unsubscribed topic: $topic');
+    }
   }
 
   void pong() {
-    print('MQTT_LOGS:: Ping response client callback invoked');
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Ping response client callback invoked');
+    }
   }
 
   void publishMessage(String topic, String message) {

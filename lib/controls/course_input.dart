@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
 import 'package:elzwelle_start/configs/mqtt_messages.dart';
+import 'package:elzwelle_start/controls/alert.dart';
 
 List<DropdownMenuItem<String>> get dropdownItems{
   List<DropdownMenuItem<String>> menuItems = [
@@ -88,9 +90,9 @@ class _CourseInputState extends State<CourseInput> {
             ),
             MaterialButton(
               height: 58,
-              child: Text(
+              child: const Text(
                 COURSE_SEND,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 22.0,
                 ),
@@ -109,11 +111,16 @@ class _CourseInputState extends State<CourseInput> {
                   final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
                   widget.mqttHandler.publishMessage(MQTT_COURSE_DATA_PUB, message);
                 } on Exception catch (e) {
+                  onAlertError(context,"Eingabe Fehler","Ein Parameter wurde nicht korrekt gesetzt!");
                   // Anything else that is an exception
-                  print('add_page exception: $e');
+                  if (kDebugMode) {
+                    print('add_page exception: $e');
+                  }
                 } finally {
                   final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
-                  print('Message: $message');
+                  if (kDebugMode) {
+                    print('Message: $message');
+                  }
                 }
               }),
           ], // children

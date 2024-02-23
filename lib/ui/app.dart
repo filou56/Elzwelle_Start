@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:elzwelle_start/ui/screens/home/home_page.dart';
+import 'package:elzwelle_start/ui/screens/home_page.dart';
+import 'package:elzwelle_start/ui/screens/mode_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
 
-const String routeAdd = '/add';
-const String routeHome = '/';
+const String routeAdd   = '/add';
+const String initHome   ='/init';
+const String routeHome  = '/';
 
 class SheetsApp extends StatelessWidget {
   final MqttHandler mqttHandler;
@@ -19,34 +21,23 @@ class SheetsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("START");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData(
           brightness:   Brightness.light,
-          primaryColor: Colors.blue,
-          // Bug in theming, set manual
+          primaryColor: Colors.lightBlue,
+          // Bug in themeing, set manual
           appBarTheme: const AppBarTheme(
-              color:           Colors.blue,
+              color:           Colors.lightBlue,
               foregroundColor: Colors.white
           ),
-          // textTheme: const TextTheme(
-          //   displayLarge: TextStyle(
-          //     fontSize: 60,
-          //   ),
-          //   displayMedium: TextStyle(
-          //     fontSize: 40,
-          //   ),
-          //   displaySmall: TextStyle(
-          //     fontSize: 20,
-          //   ),
-          // ),
       ),
       title: APP_TITLE,
-      initialRoute: routeHome,
+      initialRoute: initHome,
       routes: {
-        routeHome: (_) => HomePage(mqttHandler: mqttHandler, mode: mode),
+        initHome:  (_)  => ModePage(mode: mode),
+        routeHome: (_)  => HomePage(mqttHandler: mqttHandler, mode: mode),
       },
     );
   }

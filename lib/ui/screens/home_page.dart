@@ -1,7 +1,8 @@
 import 'dart:core';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:elzwelle_start/models/timestamp_entity.dart';
-import 'package:elzwelle_start/ui/screens/add/add_page.dart';
+import 'package:elzwelle_start/ui/screens/add_page.dart';
 import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
@@ -27,7 +28,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   final ScrollController _scrollController = ScrollController();
-  final List<TimestampEntity> _timestamps =  List.filled(0, TimestampEntity(time: '00:00:00', stamp: '0.00', number: '0',tag: '*'), growable: true);
+  final List<TimestampEntity> _timestamps  =  List.filled(0, TimestampEntity(time: '00:00:00', stamp: '0.00', number: '0',tag: '*'), growable: true);
 
   bool _tag(String stamp, String tag) {
     TimestampEntity _item;
@@ -44,17 +45,24 @@ class _HomePageState extends State<HomePage> {
   void _update(String s) {
     var _items = s.split(' ');
     // check for tree items, drop other messages
-    if (_items.length == 4) {
-      if (_items[3] == '*') {
+    if (_items.length > 2) {
+      var idx = _items.length - 1;
+      if (_items[idx] == '*') {
         _timestamps.insert(0, TimestampEntity(
-            time: _items[0], stamp: _items[1], number: _items[2], tag: _items[3]));
-        print('Insert length: ${_timestamps.length}');
-      } else if (_items[3] == '#') {
-        print('Update AKN Tag');
-        _tag(_items[1],_items[3]);
+            time: _items[0], stamp: _items[1], number: _items[2], tag: _items[idx]));
+        if (kDebugMode) {
+          print('Insert length: ${_timestamps.length}');
+        }
+      } else if (_items[idx] == '#') {
+        if (kDebugMode) {
+          print('Update AKN Tag');
+        }
+        _tag(_items[1],_items[idx]);
       } else if (_items[3] == '!') {
-        print('Update ERROR Tag');
-        _tag(_items[1],_items[3]);
+        if (kDebugMode) {
+          print('Update ERROR Tag');
+        }
+        _tag(_items[1],_items[idx]);
       }
     }
   }
@@ -68,7 +76,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(HOME_PAGE_TITLE[widget.mode.index]),
-        //backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.lightBlue,
         actions: [
           PopupMenuButton(
             itemBuilder: (context) => [
@@ -81,7 +89,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Container(
         child: () { // anonymous function
-          print('Index: ${widget.mode.index}');
+          //print('Index: ${widget.mode.index}');
           if (widget.mode.index <= 1) { // then container
             // anonymous function return Widget
             return ValueListenableBuilder<String>(
@@ -89,10 +97,14 @@ class _HomePageState extends State<HomePage> {
                 if (widget.modeIndex != widget.mode.index) {
                   _timestamps.clear();
                   widget.modeIndex = widget.mode.index;
-                  print('Clear, Mode: ${widget.mode.index}');
+                  if (kDebugMode) {
+                    print('Clear, Mode: ${widget.mode.index}');
+                  }
                   value = '';
                 } else {
-                  print('Notify: $value ');
+                  if (kDebugMode) {
+                    print('Notify: $value ');
+                  }
                   if (value.isNotEmpty) {
                     _update(value);
                   }
@@ -125,7 +137,7 @@ class _HomePageState extends State<HomePage> {
             return Center (
               child: CourseInput(mqttHandler: widget.mqttHandler),
             );
-          } // end container
+          }  // end container
         }() // anonymous function
       )
     );

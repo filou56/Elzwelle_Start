@@ -1,11 +1,13 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:elzwelle_start/controls/alert.dart';
 
 class RadioListSelection {
-  int index;
+  int index = 0;
   final List<String> selections;
 
   RadioListSelection(this.index, this.selections);
+
 }
 
 class RadioListMode extends StatefulWidget {
@@ -18,6 +20,7 @@ class RadioListMode extends StatefulWidget {
 
   @override
   _RadioListModeState createState() => _RadioListModeState();
+
 }
 
 class _RadioListModeState extends State<RadioListMode> {
@@ -37,9 +40,10 @@ class _RadioListModeState extends State<RadioListMode> {
               title: Text(widget.radioList.selections[index]),
               onChanged: (int? value) {
                 setState(() {
-                  widget.radioList.index = value!;
+                  widget.radioList.index = value ?? 0;
                   // force restart from begin with new mode
-                  Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+                  onAlertRestart(context);
+                  //Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                 });
               },
             );

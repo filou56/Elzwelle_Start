@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:elzwelle_start/configs/text_strings.dart';
 
 onAlertRestart(context) {
   // Reusable alert style
@@ -11,7 +12,7 @@ onAlertRestart(context) {
       descStyle: const TextStyle(fontWeight: FontWeight.bold),
       animationDuration: const Duration(milliseconds: 400),
       alertBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
+        borderRadius: BorderRadius.circular(10.0),
         side: const BorderSide(
           color: Colors.blue, //const Color(0xFF0040E0),
         ),
@@ -19,7 +20,8 @@ onAlertRestart(context) {
       titleStyle: const TextStyle(
         color: Colors.blue,
       ),
-      constraints: const BoxConstraints.expand(width: 300),
+      // MediaQuery.of(context).size.width * 0.9 // 90%
+      constraints: BoxConstraints.expand(width: MediaQuery.of(context).size.width * 0.9),
       //First to chars "55" represents transparency of color
       overlayColor: const Color(0x55000000),
       alertElevation: 0,
@@ -30,26 +32,26 @@ onAlertRestart(context) {
     context: context,
     style: alertStyle,
     type: AlertType.none,
-    title: "MODUS WECHSEL",
-    desc: "Alle Daten werden zurükgesetzt",
+    title: MODE_PAGE_ALERT_TEXT,
+    desc: MODE_PAGE_ALERT_INFO,
     buttons: [
       DialogButton(
         child: const Text(
-          "Cancel",
+          ALERT_CANCEL,
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         onPressed: () => Navigator.pop(context),
         color: Colors.lightBlue,
-        radius: BorderRadius.circular(0.0),
+        radius: BorderRadius.circular(10.0),
       ),
       DialogButton(
         child: const Text(
-          "Ok",
+          ALERT_OK,
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false),
         color: Colors.green,
-        radius: BorderRadius.circular(0.0),
+        radius: BorderRadius.circular(10.0),
       ),
     ],
   ).show();
@@ -64,7 +66,7 @@ onAlertError(context, String err, String msg) {
       descStyle: const TextStyle(fontWeight: FontWeight.bold),
       animationDuration: const Duration(milliseconds: 400),
       alertBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
+        borderRadius: BorderRadius.circular(10.0),
         side: const BorderSide(
           color: Colors.blue, //const Color(0xFF0040E0),
         ),
@@ -88,12 +90,12 @@ onAlertError(context, String err, String msg) {
     buttons: [
       DialogButton(
         child: const Text(
-          "Quit",
+          ALERT_CONTINUE,
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         onPressed: () => Navigator.pop(context),
         color: Colors.lightBlue,
-        radius: BorderRadius.circular(0.0),
+        radius: BorderRadius.circular(10.0),
       ),
     ],
   ).show();

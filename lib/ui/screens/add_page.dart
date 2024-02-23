@@ -31,6 +31,15 @@ class _AddPageState extends State<AddPage> {
   final TextEditingController _remarkController   = TextEditingController();
 
   @override
+  void dispose() {
+    _timeController.dispose();
+    _stampController.dispose();
+    _numController.dispose();
+    _remarkController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size.width;
 
@@ -52,12 +61,18 @@ class _AddPageState extends State<AddPage> {
                 style: const TextStyle(
                     fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _timeController,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp("[0-9:]")),
+                ], // Only numbers can be entered
                 onChanged: (_) => setState(() {}),
               ),
               TextFormField(
                 style: const TextStyle(
                     fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _stampController,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp("[0-9,]")),
+                ], // Only numbers can be entered
                 onChanged: (_) => setState(() {}),
               ),
               TextFormField(
@@ -65,6 +80,9 @@ class _AddPageState extends State<AddPage> {
                     fontSize: 24.0, fontWeight: FontWeight.bold),
                 controller: _remarkController,
                 decoration: const InputDecoration(labelText: REMARK_HINT),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                ], // Only numbers can be entered
                 onChanged: (_) => setState(() {}),
               ),
               TextField(
@@ -82,6 +100,7 @@ class _AddPageState extends State<AddPage> {
                 height: 12.0,
               ),
               MaterialButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   height: 58,
                   child: Text(
                     ADD_PAGE_SEND[widget.mode.index],
@@ -106,7 +125,7 @@ class _AddPageState extends State<AddPage> {
                       err = false;
                       } on Exception catch (e) {
                         // Anything else that is an exception
-                        onAlertError(context,"Eingabe Fehler","Ein Parameter wurde nicht korrekt gesetzt!");
+                        onAlertError(context,INPUT_ERROR_TEXT,INPUT_ERROR_INFO);
                         if (kDebugMode) {
                           print('add_page exception: $e');
                         }

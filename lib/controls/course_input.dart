@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../providers/mqtt/mqtt_handler.dart';
+import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/configs/text_strings.dart';
 import 'package:elzwelle_start/configs/mqtt_messages.dart';
 import 'package:elzwelle_start/controls/alert.dart';
@@ -35,6 +35,13 @@ class _CourseInputState extends State<CourseInput> {
   final TextEditingController _gateController     = TextEditingController();
   final TextEditingController _remarkController   = TextEditingController();
 
+  @override
+  void dispose() {
+    _gateController.dispose();
+    _numController.dispose();
+    _remarkController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size.width;
@@ -75,6 +82,9 @@ class _CourseInputState extends State<CourseInput> {
               controller: _remarkController,
               decoration: const InputDecoration(labelText: REMARK_HINT),
               onChanged: (_) => setState(() {}),
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+              ], // Only numbers can be entered
             ),
             DropdownButton(
                 value: widget.selectedValue,
@@ -89,6 +99,7 @@ class _CourseInputState extends State<CourseInput> {
               height: 12.0,
             ),
             MaterialButton(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               height: 58,
               child: const Text(
                 COURSE_SEND,
@@ -111,7 +122,7 @@ class _CourseInputState extends State<CourseInput> {
                   final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
                   widget.mqttHandler.publishMessage(MQTT_COURSE_DATA_PUB, message);
                 } on Exception catch (e) {
-                  onAlertError(context,"Eingabe Fehler","Ein Parameter wurde nicht korrekt gesetzt!");
+                  onAlertError(context,INPUT_ERROR_TEXT,INPUT_ERROR_INFO);
                   // Anything else that is an exception
                   if (kDebugMode) {
                     print('add_page exception: $e');

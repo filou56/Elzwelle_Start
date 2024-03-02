@@ -19,18 +19,20 @@ class MqttHandler with ChangeNotifier {
     _client = MqttServerClient.withPort(
         MQTT_URL, MQTT_ID_PREFIX+id.toString(), MQTT_PORT);
     _client.logging(on: false);
-    _client.onConnected      = onConnected;
-    _client.onDisconnected   = onDisconnected;
-    _client.onUnsubscribed   = onUnsubscribed;
-    _client.onSubscribed     = onSubscribed;
-    _client.onSubscribeFail  = onSubscribeFail;
-    _client.pongCallback     = pong;
-    _client.keepAlivePeriod  = 60;
+    _client.onConnected       = onConnected;
+    _client.onAutoReconnected = onAutoReconnected;
+    _client.onDisconnected    = onDisconnected;
+    _client.onUnsubscribed    = onUnsubscribed;
+    _client.onSubscribed      = onSubscribed;
+    _client.onSubscribeFail   = onSubscribeFail;
+    _client.pongCallback      = pong;
+    _client.keepAlivePeriod   = 60;
     _client.connectTimeoutPeriod = 10;
+    _client.autoReconnect     = true;
     /// HiveMQ uses TLS secure transport
-    _client.secure           = MQTT_SECURE;
-    _client.securityContext  = SecurityContext.defaultContext;
-    _client.onBadCertificate = (dynamic a) => true;
+    _client.secure            = MQTT_SECURE;
+    _client.securityContext   = SecurityContext.defaultContext;
+    _client.onBadCertificate  = (dynamic a) => true;
     /// Set the correct MQTT protocol for mosquito
     _client.setProtocolV311();
 
@@ -102,6 +104,17 @@ class MqttHandler with ChangeNotifier {
     });
 
     return _client;
+  }
+
+  void onAutoReconnected() {
+    if (kDebugMode) {
+      print('MQTT_LOGS:: Reconnected');
+      if (kDebugMode) {
+        print('MQTT_LOGS::Subscribing to the topic');
+      }
+      const topic = MQTT_TOPIC;
+      _client.subscribe(topic, MqttQos.atMostOnce);
+    }
   }
 
   void onConnected() {

@@ -88,15 +88,20 @@ class MqttHandler with ChangeNotifier {
         print('MQTT_LOGS::Listen received topic: ${c[0].topic} Payload: $rcfPayload');
       }
 
-      if (c[0].topic == MQTT_COURSE_DATA_PUB) {
+      if (c[0].topic == LOGIN_PINS) {
+        print("Login Pins");
+      } else if (c[0].topic == LOGIN_PINS_AKN) {
+        print("Login Pins AKN");
 
+      } else if (c[0].topic == MQTT_COURSE_DATA_PUB) {
+        print("Course Data");
       } else if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {
         data.value = rcfPayload+' *'; // + Tag
       } else if (c[0].topic == MQTT_STAMP_NUM_AKN[mode.index]) {
         data.value = rcfPayload+' #'; // + Tag
       } else if (c[0].topic == MQTT_STAMP_NUM_ERROR[mode.index]) {
         data.value = rcfPayload+' !'; // + Tag
-      }else {
+      } else {
         // use unique string to force notify listeners
         data.value = DateTime.now().millisecondsSinceEpoch.toString();
       }

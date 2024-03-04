@@ -36,7 +36,7 @@ class SheetsApp extends StatelessWidget {
       title: APP_TITLE,
       initialRoute: initHome,
       routes: {
-        initHome:  (_)  => ModePage(mode: mode),
+        initHome:  (_)  => ModePage(mqttHandler: mqttHandler, mode: mode),
         routeHome: (_)  => HomePage(mqttHandler: mqttHandler, mode: mode),
       },
     );

@@ -7,7 +7,9 @@ import 'package:elzwelle_start/configs/mqtt_messages.dart';
 import 'package:elzwelle_start/configs/config.dart';
 
 class MqttHandler with ChangeNotifier {
-  final ValueNotifier<String> data = ValueNotifier<String>("");
+  final ValueNotifier<String> data  = ValueNotifier<String>("");
+  final ValueNotifier<String> login = ValueNotifier<String>("");
+
   final RadioListSelection mode;
   late  MqttServerClient _client;
 
@@ -88,11 +90,15 @@ class MqttHandler with ChangeNotifier {
         print('MQTT_LOGS::Listen received topic: ${c[0].topic} Payload: $rcfPayload');
       }
 
-      if (c[0].topic == LOGIN_PINS) {
+      if (c[0].topic == MQTT_LOGIN_PUB) {
         print("Login Pins");
-      } else if (c[0].topic == LOGIN_PINS_AKN) {
+      } else if (c[0].topic == MQTT_LOGIN_AKN) {
         print("Login Pins AKN");
-
+        if (rcfPayload == "AKN") {
+          login.value = "AKN";
+        } else {
+          login.value = "NAK";
+        }
       } else if (c[0].topic == MQTT_COURSE_DATA_PUB) {
         print("Course Data");
       } else if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {

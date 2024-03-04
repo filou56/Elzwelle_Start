@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:elzwelle_start/controls/alert.dart';
 
 class RadioListSelection {
+  bool login = false;
   int index = 0;
   final List<String> selections;
 
-  RadioListSelection(this.index, this.selections);
+  RadioListSelection(this.index, this.selections, this.login);
 
 }
 

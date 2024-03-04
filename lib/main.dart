@@ -7,7 +7,7 @@ import 'package:elzwelle_start/controls/radio_list.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final RadioListSelection mode = RadioListSelection(0,HOME_PAGE_MODE);
+  final RadioListSelection mode = RadioListSelection(0,HOME_PAGE_MODE,false);
   final MqttHandler mqttHandler = MqttHandler(mode);
 
   mqttHandler.connect();

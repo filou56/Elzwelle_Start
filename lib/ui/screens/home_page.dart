@@ -105,9 +105,7 @@ class _HomePageState extends State<HomePage> {
                   if (kDebugMode) {
                     print('Notify: $value ');
                   }
-                  if (value.isNotEmpty) {
-                    _update(value);
-                  }
+                  _update(value);
                 }
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

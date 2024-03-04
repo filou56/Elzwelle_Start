@@ -10,5 +10,5 @@ const List<String>MQTT_STAMP_NUM_PUB    = ['elzwelle/stopwatch/start/number',
 
 const MQTT_COURSE_DATA_PUB              = 'elzwelle/stopwatch/course/data';
 const MQTT_TOPIC                        = 'elzwelle/stopwatch/#';
-const LOGIN_PINS                        = 'elzwelle/stopwatch/pins';
-const LOGIN_PINS_AKN                    = 'elzwelle/stopwatch/pins/akn';
+const MQTT_LOGIN_PUB                    = 'elzwelle/stopwatch/login';
+const MQTT_LOGIN_AKN                    = 'elzwelle/stopwatch/login/akn';

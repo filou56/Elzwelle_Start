@@ -5,7 +5,8 @@ const MODE_PAGE_ALERT_TEXT        = 'MODUS WECHSEL';
 const MODE_PAGE_ALERT_INFO        = 'Alle Daten werden zurükgesetzt';
 const INPUT_ERROR_TEXT            = 'Eingabe Fehler';
 const INPUT_ERROR_INFO            = 'Ein Parameter wurde nicht korrekt gesetzt!';
-
+const PIN_ERROR_TEXT              = 'PIN Fehler';
+const PIN_ERROR_INFO              = 'Zahl mit 4 Ziffern eingeben!';
 const ALERT_CANCEL                = 'Abbruch';
 const ALERT_OK                    = 'Ok';
 const ALERT_CONTINUE              = 'Weiter';
@@ -18,7 +19,7 @@ const List<String>ADD_PAGE_HINT   = ['Startnummer eingeben','Startnummer eingebe
 const List<String>ADD_PAGE_SEND   = ['Startnummer senden','Startnummer senden','Unknown Mode'];
 
 const REMARK_HINT                 = 'Optionale Bemerkung eingeben';
-
+const EXIT_BUTTON                 = 'App Beenden';
 const COURSE_SEND                 = 'Daten senden';
 const PIN_SEND                     = 'PIN senden';
 

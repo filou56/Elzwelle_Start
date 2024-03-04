@@ -91,10 +91,10 @@ class MqttHandler with ChangeNotifier {
       }
 
       if (c[0].topic == MQTT_LOGIN_PUB) {
-        print("Login Pins");
+        print("Login PIN send");
       } else if (c[0].topic == MQTT_LOGIN_AKN) {
-        print("Login Pins AKN");
-        if (rcfPayload.substring(4) == mode.id) {
+        print("Login PIN AKN");
+        if (rcfPayload == "4f4b"+mode.id) {
           login.value = "AKN";
         } else {
           login.value = "NAK";

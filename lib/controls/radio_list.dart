@@ -1,6 +1,9 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:elzwelle_start/controls/alert.dart';
+import 'dart:io' show Platform, exit;
+import 'package:flutter/services.dart';
+import 'package:elzwelle_start/configs/text_strings.dart';
 
 class ModeRadioListSelection {
   bool login = false;
@@ -31,27 +34,59 @@ class _ModeRadioListModeState extends State<ModeRadioListMode> {
   Widget build(BuildContext context) {
     return SizedBox(
         width: double.maxFinite,
-        height: 200,
-        child: ListView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            return RadioListTile<int>(
-              fillColor: MaterialStateColor.resolveWith((states) => Colors.blue),
-              value: index,
-              groupValue: widget.radioList.index,
-              toggleable: true,
-              title: Text(widget.radioList.selections[index]),
-              onChanged: (int? value) {
-                setState(() {
-                  widget.radioList.index = value ?? 0;
-                  // force restart from begin with new mode
-                  onAlertRestart(context);
-                  //Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-                });
-              },
-            );
-          },
-          itemCount: widget.radioList.selections.length,
-        ),
+        height: 300,
+        child: Column(
+          mainAxisAlignment:  MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                width: double.maxFinite,
+                height: 200,
+                child:
+                ListView.builder(
+                  itemBuilder: (BuildContext context, int index) {
+                    return RadioListTile<int>(
+                      fillColor: MaterialStateColor.resolveWith((states) => Colors.blue),
+                      value: index,
+                      groupValue: widget.radioList.index,
+                      toggleable: true,
+                      title: Text(widget.radioList.selections[index]),
+                      onChanged: (int? value) {
+                        setState(() {
+                          widget.radioList.index = value ?? 0;
+                          // force restart from begin with new mode
+                          onAlertRestart(context);
+                          //Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+                        });
+                      },
+                    );
+                  },
+                  itemCount: widget.radioList.selections.length,
+                ),
+            ),
+            MaterialButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                height: 58,
+                child: const Text(
+                    EXIT_BUTTON,
+                    style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22.0,
+                  ),
+                ),
+                color: Theme
+                    .of(context)
+                    .primaryColor,
+                onPressed: () async {
+                    if (Platform.isAndroid) {
+                      SystemNavigator.pop();
+                    } else {
+                      exit(0);
+                    }
+                }
+            ),
+        ]
+      )
     );
   }
 }

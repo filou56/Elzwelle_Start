@@ -11,7 +11,7 @@ const String routeHome  = '/';
 
 class SheetsApp extends StatelessWidget {
   final MqttHandler mqttHandler;
-  final RadioListSelection mode;
+  final ModeRadioListSelection mode;
 
   const SheetsApp({
     required this.mqttHandler,

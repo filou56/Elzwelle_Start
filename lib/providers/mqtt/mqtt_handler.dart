@@ -10,7 +10,7 @@ class MqttHandler with ChangeNotifier {
   final ValueNotifier<String> data  = ValueNotifier<String>("");
   final ValueNotifier<String> login = ValueNotifier<String>("");
 
-  final RadioListSelection mode;
+  final ModeRadioListSelection mode;
   late  MqttServerClient _client;
 
   MqttHandler(this.mode);
@@ -94,7 +94,7 @@ class MqttHandler with ChangeNotifier {
         print("Login Pins");
       } else if (c[0].topic == MQTT_LOGIN_AKN) {
         print("Login Pins AKN");
-        if (rcfPayload == "AKN") {
+        if (rcfPayload.substring(4) == mode.id) {
           login.value = "AKN";
         } else {
           login.value = "NAK";

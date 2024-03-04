@@ -17,6 +17,8 @@ dependencies:
   format: ^1.0.0
   mqtt_client: ^9.7.2
   rflutter_alert: ^2.0.7
+  device_info_plus: ^8.0.0
+  uuid: ^4.0.0
 
 dev_dependencies:
   flutter_test:

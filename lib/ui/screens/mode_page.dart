@@ -7,7 +7,7 @@ import 'package:elzwelle_start/providers/mqtt/mqtt_handler.dart';
 import 'package:elzwelle_start/configs/mqtt_messages.dart';
 
 class ModePage extends StatefulWidget {
-  final RadioListSelection mode;
+  final ModeRadioListSelection mode;
   final MqttHandler        mqttHandler;
 
   const ModePage({
@@ -84,15 +84,11 @@ class ModePageState extends State<ModePage> {
                                   onPressed: () async {
                                     var pin = 0;
                                     try {
-                                      pin = int.parse(_pinController.text);
-                                      final message = '$pin';
+                                      pin = int.parse(_pinController.text)+4096;
+                                      final message = pin.toRadixString(16)+widget.mode.id;
                                       widget.mqttHandler.publishMessage(
                                           MQTT_LOGIN_PUB, message);
-                                      // setState(() {
-                                      //   widget.mode.login = true;
-                                      // });
                                     } on Exception catch (e) {
-                                      //onAlertError(context,INPUT_ERROR_TEXT,INPUT_ERROR_INFO);
                                       // Anything else that is an exception
                                       if (kDebugMode) {
                                         print('add_page exception: $e');
@@ -109,7 +105,7 @@ class ModePageState extends State<ModePage> {
                         ),
                       );
                     } else {
-                      return RadioListMode(radioList: widget.mode);
+                      return ModeRadioListMode(radioList: widget.mode);
                     }
                   },
                   valueListenable: widget.mqttHandler.login,

@@ -11,7 +11,7 @@ import 'package:elzwelle_start/controls/course_input.dart';
 // ignore: must_be_immutable
 class HomePage extends StatefulWidget {
   final MqttHandler         mqttHandler;
-  final RadioListSelection  mode;
+  final ModeRadioListSelection  mode;
 
   int modeIndex = -1;
 
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
           PopupMenuButton(
             itemBuilder: (context) => [
               PopupMenuItem(
-                child: RadioListMode(radioList: widget.mode),
+                child: ModeRadioListMode(radioList: widget.mode),
               )
             ]
           )
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
 class TimestampCard extends StatelessWidget {
   final TimestampEntity     timestamp;
   final MqttHandler         mqttHandler;
-  final RadioListSelection  mode;
+  final ModeRadioListSelection  mode;
 
   const TimestampCard({
     required this.mqttHandler,

@@ -12,7 +12,7 @@ import 'package:elzwelle_start/configs/mqtt_messages.dart';
 class AddPage extends StatefulWidget {
   final MqttHandler        mqttHandler;
   final TimestampEntity    timestamp;
-  final RadioListSelection mode;
+  final ModeRadioListSelection mode;
 
   const AddPage({
     required this.timestamp,

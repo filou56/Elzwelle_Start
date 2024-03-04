@@ -2,29 +2,30 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:elzwelle_start/controls/alert.dart';
 
-class RadioListSelection {
+class ModeRadioListSelection {
   bool login = false;
-  int index = 0;
+  int index  = 0;
+  String id  = "";
   final List<String> selections;
 
-  RadioListSelection(this.index, this.selections, this.login);
+  ModeRadioListSelection(this.index, this.selections, this.login,this.id);
 
 }
 
-class RadioListMode extends StatefulWidget {
-  final RadioListSelection radioList;
+class ModeRadioListMode extends StatefulWidget {
+  final ModeRadioListSelection radioList;
 
-  const RadioListMode({
+  const ModeRadioListMode({
     Key? key,
     required this.radioList,
   }) : super(key: key);
 
   @override
-  _RadioListModeState createState() => _RadioListModeState();
+  _ModeRadioListModeState createState() => _ModeRadioListModeState();
 
 }
 
-class _RadioListModeState extends State<RadioListMode> {
+class _ModeRadioListModeState extends State<ModeRadioListMode> {
 
   @override
   Widget build(BuildContext context) {

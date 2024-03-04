@@ -14,7 +14,7 @@ import 'package:elzwelle_start/controls/radio_list.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
 
-    RadioListSelection mode = RadioListSelection(0,['Start','Finish']);
+    ModeRadioListSelection mode = ModeRadioListSelection(0,['Start','Finish'],false,"");
     MqttHandler mqttHandler = MqttHandler(mode);
 
     mqttHandler.connect();

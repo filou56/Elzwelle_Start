@@ -21,7 +21,9 @@ const List<String>ADD_PAGE_SEND   = ['Startnummer senden','Startnummer senden','
 const REMARK_HINT                 = 'Optionale Bemerkung eingeben';
 const EXIT_BUTTON                 = 'App Beenden';
 const COURSE_SEND                 = 'Daten senden';
-const PIN_SEND                     = 'PIN senden';
+const COURSE_STATUS_SEND          = 'Send';
+const COURSE_STATUS_OK            = 'Ok';
+const PIN_SEND                    = 'PIN senden';
 
 const List<String>COURSE_INP_HINT = ['Startnummer eingeben','Tornummer eingeben'];
 

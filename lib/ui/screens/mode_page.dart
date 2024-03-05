@@ -42,6 +42,8 @@ class ModePageState extends State<ModePage> {
               if (login == "AKN") {
                 widget.mode.login = true;
               }
+              widget.mqttHandler.login.value = '';
+
               if (!widget.mode.login) {
                 return Center(
                   child: SizedBox(

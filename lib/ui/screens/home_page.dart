@@ -107,6 +107,8 @@ class _HomePageState extends State<HomePage> {
                   }
                   _update(value);
                 }
+                widget.mqttHandler.data.value = '';
+
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -131,10 +133,9 @@ class _HomePageState extends State<HomePage> {
               valueListenable: widget.mqttHandler.data,
             );
           } else { // else container
-            // anonymous function return Widget
-            return Center (
-              child: CourseInput(mqttHandler: widget.mqttHandler),
-            );
+            return Center(
+                  child: CourseInput(mqttHandler: widget.mqttHandler),
+                );
           }  // end container
         }() // anonymous function
       )

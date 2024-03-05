@@ -9,6 +9,7 @@ import 'package:elzwelle_start/configs/config.dart';
 class MqttHandler with ChangeNotifier {
   final ValueNotifier<String> data  = ValueNotifier<String>("");
   final ValueNotifier<String> login = ValueNotifier<String>("");
+  final ValueNotifier<String> akn   = ValueNotifier<String>("");
 
   final ModeRadioListSelection mode;
   late  MqttServerClient _client;
@@ -101,6 +102,10 @@ class MqttHandler with ChangeNotifier {
         }
       } else if (c[0].topic == MQTT_COURSE_DATA_PUB) {
         print("Course Data");
+        akn.value = 'SEND';
+      } else if (c[0].topic == MQTT_COURSE_DATA_AKN) {
+        print("Course Data AKN");
+        akn.value = 'OK';
       } else if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {
         data.value = rcfPayload+' *'; // + Tag
       } else if (c[0].topic == MQTT_STAMP_NUM_AKN[mode.index]) {

@@ -45,99 +45,132 @@ class _CourseInputState extends State<CourseInput> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size.width;
+    TextStyle _textStyle = TextStyle(
+                              fontSize: 20.0, fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            );
+    String status = "";
 
     return Scaffold(
-    body: Center(
-      child: SizedBox(
-        width:  size > 300 ? 300 : size,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              style: const TextStyle(
-                  fontSize: 24.0, fontWeight: FontWeight.bold),
-              controller: _numController,
-              decoration: InputDecoration(labelText: COURSE_INP_HINT[0]),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ], // Only numbers can be entered
-              onChanged: (_) => setState(() {}),
-            ),
-            TextFormField(
-              style: const TextStyle(
-                  fontSize: 24.0, fontWeight: FontWeight.bold),
-              controller: _gateController,
-              decoration: InputDecoration(labelText: COURSE_INP_HINT[1]),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ], // Only numbers can be entered
-              onChanged: (_) => setState(() {}),
-            ),
-            TextFormField(
-              style: const TextStyle(
-                  fontSize: 24.0, fontWeight: FontWeight.bold),
-              controller: _remarkController,
-              decoration: const InputDecoration(labelText: REMARK_HINT),
-              onChanged: (_) => setState(() {}),
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
-              ], // Only numbers can be entered
-            ),
-            DropdownButton(
-                value: widget.selectedValue,
-                onChanged: (String? newValue){
-                  setState(() {
-                    widget.selectedValue = newValue!;
-                  });
-                },
-                items: dropdownItems
-            ),
-            const SizedBox(
-              height: 12.0,
-            ),
-            MaterialButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              height: 58,
-              child: const Text(
-                COURSE_SEND,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22.0,
-                ),
+      body: ValueListenableBuilder<String>(
+        builder: (BuildContext context, String akn, Widget? child) {
+          print('Notify course: $akn');
+
+          if (akn == "SEND") {
+            status = COURSE_STATUS_SEND;
+            _textStyle = const TextStyle(
+              fontSize: 20.0, fontWeight: FontWeight.bold,
+              color: Colors.cyan,
+            );
+          } else if (akn == "OK") {
+            status = COURSE_STATUS_OK;
+            _textStyle = const TextStyle(
+              fontSize: 20.0, fontWeight: FontWeight.bold,
+              color: Colors.green,
+            );
+          } else {
+            status = '';
+            _textStyle = const TextStyle(
+              fontSize: 20.0, fontWeight: FontWeight.bold,
+              color: Colors.black,
+            );
+          }
+          widget.mqttHandler.akn.value = '';
+
+          return Center(
+            child: SizedBox(
+              width:  size > 300 ? 300 : size,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text( status,
+                      style: _textStyle,
+                      textAlign: TextAlign.start),
+                  TextFormField(
+                    style: _textStyle,
+                    controller: _numController,
+                    decoration: InputDecoration(labelText: COURSE_INP_HINT[0]),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ], // Only numbers can be entered
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  TextFormField(
+                    style: _textStyle,
+                    controller: _gateController,
+                    decoration: InputDecoration(labelText: COURSE_INP_HINT[1]),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ], // Only numbers can be entered
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  TextFormField(
+                    style: _textStyle,
+                    controller: _remarkController,
+                    decoration: const InputDecoration(labelText: REMARK_HINT),
+                    onChanged: (_) => setState(() {}),
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                    ], // Only numbers can be entered
+                  ),
+                  DropdownButton(
+                      value: widget.selectedValue,
+                      onChanged: (String? newValue){
+                        setState(() {
+                          widget.selectedValue = newValue!;
+                        });
+                      },
+                      items: dropdownItems
+                  ),
+                  const SizedBox(
+                    height: 12.0,
+                  ),
+                  MaterialButton(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    height: 58,
+                    child: const Text(
+                      COURSE_SEND,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22.0,
+                      ),
+                    ),
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () async {
+                      var num     = 0;
+                      var gate    = 0;
+                      var errno   = 0;
+                      var remark  = '';
+                      try {
+                        num     = int.parse(_numController.text);
+                        gate    = int.parse(_gateController.text);
+                        errno   = int.parse(widget.selectedValue);
+                        remark  = _remarkController.text; //.replaceAll(' ', '_');
+                        final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
+                        widget.mqttHandler.publishMessage(MQTT_COURSE_DATA_PUB, message);
+                      } on Exception catch (e) {
+                        onAlertError(context,INPUT_ERROR_TEXT,INPUT_ERROR_INFO);
+                        // Anything else that is an exception
+                        if (kDebugMode) {
+                          print('add_page exception: $e');
+                        }
+                      } finally {
+                        final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
+                        if (kDebugMode) {
+                          print('Message: $message');
+                        }
+                      }
+                    }),
+                ], // children
               ),
-              color: Theme.of(context).primaryColor,
-              onPressed: () async {
-                var num     = 0;
-                var gate    = 0;
-                var errno   = 0;
-                var remark  = '';
-                try {
-                  num     = int.parse(_numController.text);
-                  gate    = int.parse(_gateController.text);
-                  errno   = int.parse(widget.selectedValue);
-                  remark  = _remarkController.text; //.replaceAll(' ', '_');
-                  final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
-                  widget.mqttHandler.publishMessage(MQTT_COURSE_DATA_PUB, message);
-                } on Exception catch (e) {
-                  onAlertError(context,INPUT_ERROR_TEXT,INPUT_ERROR_INFO);
-                  // Anything else that is an exception
-                  if (kDebugMode) {
-                    print('add_page exception: $e');
-                  }
-                } finally {
-                  final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
-                  if (kDebugMode) {
-                    print('Message: $message');
-                  }
-                }
-              }),
-          ], // children
-        ),
-      ),
-      ),
+            ),
+            );
+        },
+        valueListenable: widget.mqttHandler.akn,
+      )
     );
   }
 }

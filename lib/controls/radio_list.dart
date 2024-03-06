@@ -52,7 +52,8 @@ class _ModeRadioListModeState extends State<ModeRadioListMode> {
                       title: Text(widget.radioList.selections[index]),
                       onChanged: (int? value) {
                         setState(() {
-                          widget.radioList.index = value ?? 0;
+                          print("Canged: $value");
+                          widget.radioList.index = value ?? widget.radioList.index;
                           // force restart from begin with new mode
                           onAlertRestart(context);
                           //Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);

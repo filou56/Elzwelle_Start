@@ -91,6 +91,8 @@ class MqttHandler with ChangeNotifier {
         print('MQTT_LOGS::Listen received topic: ${c[0].topic} Payload: $rcfPayload');
       }
 
+      var items = rcfPayload.split(',');
+
       if (c[0].topic == MQTT_LOGIN_PUB) {
         print("Login PIN send");
       } else if (c[0].topic == MQTT_LOGIN_AKN) {
@@ -101,11 +103,15 @@ class MqttHandler with ChangeNotifier {
           login.value = "NAK";
         }
       } else if (c[0].topic == MQTT_COURSE_DATA_PUB) {
-        print("Course Data");
-        akn.value = 'SEND';
+        if ((items.length >= 5) && (mode.id == items[4])) {
+          print("Course Data");
+          akn.value = 'SEND';
+        }
       } else if (c[0].topic == MQTT_COURSE_DATA_AKN) {
-        print("Course Data AKN");
-        akn.value = 'OK';
+        if ((items.length >= 5) && (mode.id == items[4])) {
+          print("Course Data AKN");
+          akn.value = 'OK';
+        }
       } else if (c[0].topic == MQTT_STAMP_DATA[mode.index]) {
         data.value = rcfPayload+' *'; // + Tag
       } else if (c[0].topic == MQTT_STAMP_NUM_AKN[mode.index]) {

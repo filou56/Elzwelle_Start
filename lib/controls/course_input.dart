@@ -144,12 +144,13 @@ class _CourseInputState extends State<CourseInput> {
                       var gate    = 0;
                       var errno   = 0;
                       var remark  = '';
+                      var id      = widget.mqttHandler.mode.id;
                       try {
                         num     = int.parse(_numController.text);
                         gate    = int.parse(_gateController.text);
                         errno   = int.parse(widget.selectedValue);
                         remark  = _remarkController.text; //.replaceAll(' ', '_');
-                        final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
+                        final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark,$id';
                         widget.mqttHandler.publishMessage(MQTT_COURSE_DATA_PUB, message);
                       } on Exception catch (e) {
                         onAlertError(context,INPUT_ERROR_TEXT,INPUT_ERROR_INFO);
@@ -158,7 +159,7 @@ class _CourseInputState extends State<CourseInput> {
                           print('add_page exception: $e');
                         }
                       } finally {
-                        final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark';
+                        final message = '$num,$gate,${COURSE_PENALTY_SECONDS[errno]},${COURSE_SELECTION_TEXT[errno]} $remark,$id';
                         if (kDebugMode) {
                           print('Message: $message');
                         }

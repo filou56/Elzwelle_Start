@@ -15,7 +15,9 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
 
     ModeRadioListSelection mode = ModeRadioListSelection(0,['Start','Finish'],false,"");
-    MqttHandler mqttHandler = MqttHandler(mode);
+    var config = MqttConfig(net:0);
+
+    final MqttHandler mqttHandler = MqttHandler(config,mode);
 
     mqttHandler.connect();
 

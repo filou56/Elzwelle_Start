@@ -6,6 +6,14 @@ import 'package:elzwelle_start/controls/radio_list.dart';
 import 'package:elzwelle_start/configs/mqtt_messages.dart';
 import 'package:elzwelle_start/configs/config.dart';
 
+class MqttConfig {
+  int net;
+
+  MqttConfig({
+    required this.net,
+  });
+}
+
 class MqttHandler with ChangeNotifier {
   final ValueNotifier<String> data  = ValueNotifier<String>("");
   final ValueNotifier<String> login = ValueNotifier<String>("");
@@ -13,14 +21,15 @@ class MqttHandler with ChangeNotifier {
 
   final ModeRadioListSelection mode;
   late  MqttServerClient _client;
+  final MqttConfig config;
 
-  MqttHandler(this.mode);
+  MqttHandler(this.config,this.mode);
 
   var id = UniqueKey();
 
   Future<Object> connect() async {
     _client = MqttServerClient.withPort(
-        MQTT_URL, MQTT_ID_PREFIX+id.toString(), MQTT_PORT);
+        MQTT_URL[config.net], MQTT_ID_PREFIX[config.net]+id.toString(), MQTT_PORT[config.net]);
     _client.logging(on: false);
     _client.onConnected       = onConnected;
     _client.onAutoReconnected = onAutoReconnected;
@@ -33,15 +42,15 @@ class MqttHandler with ChangeNotifier {
     _client.connectTimeoutPeriod = 10;
     _client.autoReconnect     = true;
     /// HiveMQ uses TLS secure transport
-    _client.secure            = MQTT_SECURE;
-    _client.securityContext   = SecurityContext.defaultContext;
-    _client.onBadCertificate  = (dynamic a) => true;
+    // _client.secure            = MQTT_SECURE;
+    // _client.securityContext   = SecurityContext.defaultContext;
+    // _client.onBadCertificate  = (dynamic a) => true;
     /// Set the correct MQTT protocol for mosquito
     _client.setProtocolV311();
 
     final connMessage = MqttConnectMessage()
-        .withWillTopic(MQTT_WILL_TOPIC)
-        .withWillMessage(MQTT_WILL_MSG)
+        .withWillTopic(MQTT_WILL_TOPIC[config.net])
+        .withWillMessage(MQTT_WILL_MSG[config.net])
         .startClean()
         .withWillQos(MqttQos.atLeastOnce);
 
@@ -52,7 +61,7 @@ class MqttHandler with ChangeNotifier {
     _client.connectionMessage = connMessage;
     try {
       /// HiveMQ uses password authentication
-      await _client.connect(MQTT_USER, MQTT_PASSWD);
+      await _client.connect(MQTT_USER[config.net], MQTT_PASSWD[config.net]);
     } catch (e) {
         if (kDebugMode) {
           print('Exception: $e');
@@ -79,7 +88,7 @@ class MqttHandler with ChangeNotifier {
       print('MQTT_LOGS::Subscribing to the topic');
     }
     const topic = MQTT_TOPIC;
-    _client.subscribe(topic, MqttQos.atMostOnce);
+    _client.subscribe(topic, MqttQos.atLeastOnce);
 
     //--------------------- Listner -------------------
 
@@ -89,6 +98,11 @@ class MqttHandler with ChangeNotifier {
 
       if (kDebugMode) {
         print('MQTT_LOGS::Listen received topic: ${c[0].topic} Payload: $rcfPayload');
+      }
+
+      // Drop QOS 0
+      if (c[0].payload?.header?.qos == MqttQos.atMostOnce) {
+        return;
       }
 
       var items = rcfPayload.split(',');
@@ -180,7 +194,7 @@ class MqttHandler with ChangeNotifier {
     builder.addString(message);
 
     if (_client.connectionStatus?.state == MqttConnectionState.connected) {
-      _client.publishMessage(topic, MqttQos.atMostOnce, builder.payload!);
+      _client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
     }
   }
 }

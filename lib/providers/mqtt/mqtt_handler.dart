@@ -41,11 +41,13 @@ class MqttHandler with ChangeNotifier {
     _client.keepAlivePeriod   = 60;
     _client.connectTimeoutPeriod = 10;
     _client.autoReconnect     = true;
-    /// HiveMQ uses TLS secure transport
-    // _client.secure            = MQTT_SECURE;
-    // _client.securityContext   = SecurityContext.defaultContext;
-    // _client.onBadCertificate  = (dynamic a) => true;
-    /// Set the correct MQTT protocol for mosquito
+    // HiveMQ uses TLS secure transport
+    if (MQTT_SECURE[config.net]) {
+      _client.secure = MQTT_SECURE[config.net];
+      _client.securityContext = SecurityContext.defaultContext;
+      _client.onBadCertificate = (dynamic a) => true;
+    }
+    // Set the correct MQTT protocol for mosquito
     _client.setProtocolV311();
 
     final connMessage = MqttConnectMessage()

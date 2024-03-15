@@ -41,6 +41,18 @@ class _HomePageState extends State<HomePage> {
     }
     return false;
   }
+
+  bool _num(String stamp, String num) {
+    TimestampEntity _item;
+
+    for (_item in _timestamps ) {
+      if ( _item.stamp == stamp ) {
+        _item.number = num;
+        return true;
+      }
+    }
+    return false;
+  }
   
   void _update(String s) {
     var _items = s.split(' ');
@@ -58,6 +70,7 @@ class _HomePageState extends State<HomePage> {
           print('Update AKN Tag');
         }
         _tag(_items[1],_items[idx]);
+        _num(_items[1],_items[2]);
       } else if (_items[3] == '!') {
         if (kDebugMode) {
           print('Update ERROR Tag');
